@@ -34,13 +34,13 @@ module.exports = class World {
     \n----------------------------`);
   }
   life() {
-    let indexCandidateToAnotherWorld = []
+    let indexCandidatesToAnotherWorld = []
     for(let i=0; i<this.population.length; i++) {
       let human = this.population[i];
       human.age++;
       if (human.age === human.maxAge) {
         this.goAnotherLife(this.nextWorld, human);
-        indexCandidateToAnotherWorld.push(human);
+        indexCandidatesToAnotherWorld.push(i);
         continue;
       }
       if (human.age >= 18 && human.children.length === 0) {
@@ -50,8 +50,8 @@ module.exports = class World {
         this.createCouple(human);
       }
     }
-    for (let index of indexCandidateToAnotherWorld) {
-      this.population.splice(index, 1);
+    for (let i=indexCandidatesToAnotherWorld.length-1; i>=0; i--) {
+      this.population.splice(indexCandidatesToAnotherWorld[i], 1);
     }
     this.newLife();
   }
