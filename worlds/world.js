@@ -1,12 +1,28 @@
 const Men = require("../human/men");
 const Women = require("../human/women");
 const {getRandomParameter, maleNames, femaleNames, eyeColors, getRandomAge, getRandomEyes, minAges, maxAges, gender} = require("../helper/randomHelper");
+const {nextYear} = require("../helper/timeHelper")
 module.exports = class World {
-  constructor(humans, nextWorld) {
-    this.population = [...humans];
+  constructor(nextWorld, year, periodLife) {
+    this.population = [
+      new Men(getRandomParameter(maleNames), getRandomParameter(eyeColors), getRandomAge(minAges, maxAges)),
+      new Women(getRandomParameter(femaleNames), getRandomParameter(eyeColors), getRandomAge(minAges, maxAges))
+    ];
     this.nextWorld = nextWorld;
     this.firstColorEyes = [this.population[0].eyes, this.population[1].eyes];
     this.couples = [];
+    this.year = year;
+    this.periodLife = periodLife;
+    this.start();
+  }
+  start() {
+    return (async () => {
+      while(this.periodLife >= 0) {
+        await nextYear(this.year);
+        this.life()
+        this.periodLife--;
+      }
+    })()
   }
   getStatistic() {
     let male = 0;
@@ -56,6 +72,7 @@ module.exports = class World {
     this.newLife();
   }
   createCouple (human) {
+    let foundPair = false;
     if (this.couples.length === 0) {
       this.couples.push([human]);
       return
@@ -65,6 +82,10 @@ module.exports = class World {
         continue;
       }
       pair[1] = human;
+      foundPair = true;
+    }
+    if (!foundPair) {
+      this.couples.push([human]);
     }
   }
   newLife () {
