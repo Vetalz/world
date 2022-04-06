@@ -1,4 +1,4 @@
-const Human = require("./human");
+const Human = require("./Human");
 
 module.exports = class Men extends Human {
   constructor(name, eyes, maxAge) {

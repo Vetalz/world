@@ -1,5 +1,5 @@
-const Men = require("../human/men");
-const Women = require("../human/women");
+const Men = require("../human/Man");
+const Women = require("../human/Woman");
 const {getRandomParameter, maleNames, femaleNames, eyeColors, getRandomAge, getRandomEyes, minAges, maxAges, gender} = require("../helper/randomHelper");
 const {nextYear} = require("../helper/timeHelper")
 module.exports = class World {
@@ -15,6 +15,7 @@ module.exports = class World {
     this.periodLife = periodLife;
     this.start();
   }
+
   start() {
     return (async () => {
       while(this.periodLife >= 0) {
@@ -24,13 +25,15 @@ module.exports = class World {
       }
     })()
   }
+
   getStatistic() {
     let male = 0;
     let female = 0;
     let notStandardColorEyes = 0;
     let ages = 0
     let averageAge = 0;
-    let population = this.population.length
+    const population = this.population.length
+
     for(let people of this.population) {
       if (people.gender === 'male') {
         male++;
@@ -44,39 +47,53 @@ module.exports = class World {
     }
     averageAge = Math.round(ages / population);
 
-    return (`men: ${male}\nwomen: ${female} \
-    \nnot standard color eyes: ${notStandardColorEyes} \
-    \naverageAge: ${averageAge}\npopulation: ${population} \
-    \n----------------------------`);
+    return {
+      men: male,
+      women: female,
+      notStandardColorEyes: notStandardColorEyes,
+      averageAge,
+      population
+    };
   }
+
   life() {
-    let indexCandidatesToAnotherWorld = []
+    const indexCandidatesToAnotherWorld = [];
+
     for(let i=0; i<this.population.length; i++) {
       let human = this.population[i];
-      human.age++;
-      if (human.age === human.maxAge) {
+
+      try {
+        human.growUp()
+      } catch (e) {
         this.goAnotherLife(this.nextWorld, human);
         indexCandidatesToAnotherWorld.push(i);
         continue;
       }
+
       if (human.age >= 18 && human.children.length === 0) {
         this.createCouple(human);
       }
+
       if (human.children.length !== 0 && human.children[human.children.length-1].age >= 5) {
         this.createCouple(human);
       }
     }
+
     for (let i=indexCandidatesToAnotherWorld.length-1; i>=0; i--) {
       this.population.splice(indexCandidatesToAnotherWorld[i], 1);
     }
+
     this.newLife();
   }
+
   createCouple (human) {
     let foundPair = false;
+
     if (this.couples.length === 0) {
       this.couples.push([human]);
       return
     }
+
     for (let pair of this.couples) {
       if (pair.length === 2 || pair[0].gender === human.gender) {
         continue;
@@ -84,14 +101,17 @@ module.exports = class World {
       pair[1] = human;
       foundPair = true;
     }
+
     if (!foundPair) {
       this.couples.push([human]);
     }
   }
+
   newLife () {
     if (this.couples.length === 0) {
       return;
     }
+
     for (let pair of this.couples) {
       if (pair.length < 2) {
         continue;
@@ -100,16 +120,18 @@ module.exports = class World {
     }
     this.couples = []
   }
+
   setNewHuman (parent1, parent2) {
-    let newGender = getRandomParameter(gender);
+    const newGender = getRandomParameter(gender);
     let newHuman;
-    let newEyes = getRandomEyes(parent1.eyes, parent2.eyes);
+    const newEyes = getRandomEyes(parent1.eyes, parent2.eyes);
 
     if (newGender === 'male') {
       newHuman = new Men(getRandomParameter(maleNames), newEyes, getRandomAge(minAges, maxAges));
     } else {
       newHuman = new Women(getRandomParameter(femaleNames), newEyes, getRandomAge(minAges, maxAges));
     }
+
     newHuman.parents = [parent1, parent2];
     parent1.children.push(newHuman);
     parent2.children.push(newHuman);

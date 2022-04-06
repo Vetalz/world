@@ -8,5 +8,11 @@ module.exports = class Human {
     this.parents = [];
     this.children = [];
   }
+  growUp() {
+    if(this.age >= this.maxAge) {
+      throw new Error("Can't grow up")
+    }
+    this.age++
+  }
 }
 

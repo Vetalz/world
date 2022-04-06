@@ -1,5 +1,5 @@
-const World = require("./worlds/world");
-const AnotherWorld = require("./worlds/anotherWorld");
+const World = require("./worlds/World");
+const AnotherWorld = require("./worlds/AnotherWorld");
 const {nextYear} = require("./helper/timeHelper");
 
 const year = 100;          // длительность года в мсек
